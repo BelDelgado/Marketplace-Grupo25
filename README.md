@@ -2,10 +2,7 @@
 
 Plataforma colaborativa para la compra, venta e intercambio de insumos para uñas en comunidades locales.
 
-<p align="center">
-  <img src="docs/images/LogoUnasBellas.png" alt="Logo" width="300"/>
-</p>
-
+<img width="500" height="500" alt="Image" src="https://github.com/user-attachments/assets/3bab1b83-dc98-4325-92cd-9e0c0e5a8b8e" />
 
 📑 Tabla de Contenidos
 
@@ -119,5 +116,5 @@ GitHub Issues: Crear issue
  Integración con redes sociales
 
  <p align="center">
-  Hecho con ❤️ por el Bell
+  Hecho con ❤️ por Bell
 </p>
