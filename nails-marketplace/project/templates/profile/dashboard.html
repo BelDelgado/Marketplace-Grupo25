@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+
+{% block title %}Mi Perfil - {{ user.username }}{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <!-- Header del Perfil -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-2 text-center">
+                        {% if user.profile.avatar %}
+                            <img src="{{ user.profile.avatar.url }}" class="rounded-circle" width="120" height="120" alt="Avatar">
+                        {% else %}
+                            <div class="rounded-circle bg-primary d-inline-flex align-items-center justify-content-center" 
+                                 style="width: 120px; height: 120px;">
+                                <i class="fas fa-user fa-3x text-white"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-7">
+                        <h2 class="mb-1">{{ user.get_full_name|default:user.username }}</h2>
+                        <p class="text-muted mb-2">
+                            <i class="fas fa-at"></i> @{{ user.username }}
+                        </p>
+                        <p class="mb-2">
+                            <span class="badge bg-primary">{{ user.get_role_display }}</span>
+                            {% if user.reputation.is_verified_seller %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle"></i> Verificado
+                                </span>
+                            {% endif %}
+                        </p>
+                        <div class="d-flex gap-3">
+                            <div>
+                                <i class="fas fa-star text-warning"></i>
+                                <strong>{{ user.reputation.average_rating }}</strong>/5.0
+                            </div>
+                            <div>
+                                <i class="fas fa-box"></i>
+                                <strong>{{ user.products.count }}</strong> productos
+                            </div>
+                            <div>
+                                <i class="fas fa-heart text-danger"></i>
+                                <strong>{{ user.favorites.count }}</strong> favoritos
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <a href="{% url 'profile_edit' %}" class="btn btn-outline-primary mb-2">
+                            <i class="fas fa-edit"></i> Editar Perfil
+                        </a>
+                        <a href="{% url 'account_logout' %}" class="btn btn-outline-danger">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs de navegación -->
+        <ul class="nav nav-tabs mb-4" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#mis-productos">
+                    <i class="fas fa-box"></i> Mis Productos
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#favoritos">
+                    <i class="fas fa-heart"></i> Favoritos
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#resenas">
+                    <i class="fas fa-star"></i> Reseñas
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#configuracion">
+                    <i class="fas fa-cog"></i> Configuración
+                </a>
+            </li>
+        </ul>
+
+        <!-- Contenido de las tabs -->
+        <div class="tab-content">
+            <!-- Mis Productos -->
+            <div class="tab-pane fade show active" id="mis-productos">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4>Mis Productos</h4>
+                    <a href="#" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nuevo Producto
+                    </a>
+                </div>
+
+                <div class="row" id="my-products-container">
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-spinner fa-spin fa-3x text-muted"></i>
+                        <p class="mt-3 text-muted">Cargando productos...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Favoritos -->
+            <div class="tab-pane fade" id="favoritos">
+                <h4 class="mb-3">Productos Favoritos</h4>
+                <div class="row" id="favorites-container">
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-spinner fa-spin fa-3x text-muted"></i>
+                        <p class="mt-3 text-muted">Cargando favoritos...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reseñas -->
+            <div class="tab-pane fade" id="resenas">
+                <h4 class="mb-3">Reseñas Recibidas</h4>
+                <div id="reviews-container">
+                    {% for review in user.reviews_received.all %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <strong>{{ review.reviewer.username }}</strong>
+                                        <div class="text-warning">
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= review.rating %}
+                                                    <i class="fas fa-star"></i>
+                                                {% else %}
+                                                    <i class="far fa-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">{{ review.created_at|date:"d/m/Y" }}</small>
+                                </div>
+                                <p class="mt-2 mb-0">{{ review.comment }}</p>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="text-muted">Aún no tienes reseñas</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Configuración -->
+            <div class="tab-pane fade" id="configuracion">
+                <h4 class="mb-3">Configuración de la Cuenta</h4>
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">Información Personal</h6>
+                        <p><strong>Email:</strong> {{ user.email }}</p>
+                        <p><strong>Teléfono:</strong> {{ user.phone|default:"No especificado" }}</p>
+                        <p><strong>Ciudad:</strong> {{ user.profile.city|default:"No especificado" }}</p>
+                        
+                        <hr>
+                        
+                        <h6 class="card-title">Acciones</h6>
+                        <a href="{% url 'account_change_password' %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-key"></i> Cambiar Contraseña
+                        </a>
+                        <a href="{% url 'account_email' %}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-envelope"></i> Gestionar Emails
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Cargar productos del usuario
+async function loadMyProducts() {
+    try {
+        const response = await fetch('/api/v1/products/my_products/');
+        const data = await response.json();
+        
+        const container = document.getElementById('my-products-container');
+        
+        if (data.results && data.results.length > 0) {
+            container.innerHTML = data.results.map(product => `
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">${product.title}</h5>
+                            <p class="text-primary fw-bold">$${product.price}</p>
+                            <span class="badge bg-${product.status === 'available' ? 'success' : 'secondary'}">
+                                ${product.status}
+                            </span>
+                            <div class="mt-3">
+                                <a href="/products/${product.id}" class="btn btn-sm btn-primary">Ver</a>
+                                <a href="/products/${product.id}/edit" class="btn btn-sm btn-outline-primary">Editar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Aún no tienes productos publicados</p>
+                    <a href="#" class="btn btn-primary">Publicar Primer Producto</a>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// Cargar favoritos
+async function loadFavorites() {
+    try {
+        const response = await fetch('/api/v1/products/favorites/');
+        const data = await response.json();
+        
+        const container = document.getElementById('favorites-container');
+        
+        if (data.results && data.results.length > 0) {
+            container.innerHTML = data.results.map(product => `
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">${product.title}</h5>
+                            <p class="text-primary fw-bold">$${product.price}</p>
+                            <a href="/products/${product.id}" class="btn btn-sm btn-primary">Ver Producto</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-heart-broken fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No tienes productos favoritos</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// Cargar al iniciar
+document.addEventListener('DOMContentLoaded', function() {
+    loadMyProducts();
+    
+    // Cargar favoritos cuando se hace click en la tab
+    document.querySelector('[data-bs-toggle="tab"][href="#favoritos"]').addEventListener('click', function() {
+        loadFavorites();
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Perfil - {{ user.username }}{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            {% if user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}" class="rounded-circle mb-3" width="100" height="100" alt="Avatar">
+                            {% else %}
+                                <div class="rounded-circle bg-primary d-inline-flex align-items-center justify-content-center mb-3" 
+                                     style="width: 100px; height: 100px;">
+                                    <i class="fas fa-user fa-3x text-white"></i>
+                                </div>
+                            {% endif %}
+                            <h5 class="mb-0">{{ user.username }}</h5>
+                            <small class="text-muted">{{ user.email }}</small>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="list-group list-group-flush">
+                            <a href="{% url 'profile_dashboard' %}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-arrow-left me-2"></i>Volver al perfil
+                            </a>
+                            <a href="{% url 'account_change_password' %}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-key me-2"></i>Cambiar contraseña
+                            </a>
+                            <a href="{% url 'account_email' %}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-envelope me-2"></i>Gestionar emails
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3">
+                        <h4 class="mb-0">
+                            <i class="fas fa-edit me-2"></i>Editar Perfil
+                        </h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Messages -->
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            <!-- Avatar -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Foto de Perfil</label>
+                                <input type="file" name="avatar" class="form-control" accept="image/*">
+                                <div class="form-text">Formatos permitidos: JPG, PNG. Máximo 2MB</div>
+                            </div>
+
+                            <!-- Información Personal -->
+                            <h5 class="mb-3">Información Personal</h5>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Nombre</label>
+                                    <input type="text" name="first_name" class="form-control" 
+                                           value="{{ user.first_name }}" placeholder="Tu nombre">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Apellido</label>
+                                    <input type="text" name="last_name" class="form-control" 
+                                           value="{{ user.last_name }}" placeholder="Tu apellido">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Teléfono</label>
+                                <input type="tel" name="phone" class="form-control" 
+                                       value="{{ user.phone }}" placeholder="+54 11 1234-5678">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Biografía</label>
+                                <textarea name="bio" class="form-control" rows="3" 
+                                          placeholder="Cuéntanos sobre ti">{{ user.profile.bio }}</textarea>
+                            </div>
+
+                            <!-- Ubicación -->
+                            <h5 class="mb-3">Ubicación</h5>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Ciudad</label>
+                                    <input type="text" name="city" class="form-control" 
+                                           value="{{ user.profile.city }}" placeholder="Buenos Aires">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Provincia</label>
+                                    <input type="text" name="state" class="form-control" 
+                                           value="{{ user.profile.state }}" placeholder="CABA">
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Dirección</label>
+                                <input type="text" name="address" class="form-control" 
+                                       value="{{ user.profile.address }}" placeholder="Calle 123">
+                            </div>
+
+                            <!-- Redes Sociales -->
+                            <h5 class="mb-3">Redes Sociales</h5>
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fab fa-instagram text-danger"></i> Instagram
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">@</span>
+                                    <input type="text" name="instagram" class="form-control" 
+                                           value="{{ user.profile.instagram }}" placeholder="tu_usuario">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fab fa-facebook text-primary"></i> Facebook
+                                </label>
+                                <input type="text" name="facebook" class="form-control" 
+                                       value="{{ user.profile.facebook }}" placeholder="facebook.com/tu-perfil">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">
+                                    <i class="fab fa-whatsapp text-success"></i> WhatsApp
+                                </label>
+                                <input type="tel" name="whatsapp" class="form-control" 
+                                       value="{{ user.profile.whatsapp }}" placeholder="+54 9 11 1234-5678">
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="fas fa-save me-2"></i>Guardar Cambios
+                                </button>
+                                <a href="{% url 'profile_dashboard' %}" class="btn btn-outline-secondary">
+                                    Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
